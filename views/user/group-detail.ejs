@@ -1,0 +1,525 @@
+<%- include('../partials/head') %> <%- include('../partials/nav', { isLoggedIn:
+true, showGroupButtons: true, currentGroupId: group._id }) %>
+
+<body
+  class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen"
+>
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-6xl mx-auto">
+      <!-- Group Header -->
+      <div
+        class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl p-6 sm:p-8 border border-white/20 mb-8"
+      >
+        <div
+          class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6"
+        >
+          <div class="mb-4 sm:mb-0">
+            <h1
+              class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2"
+            >
+              <%= group.name %>
+            </h1>
+            <% if (group.description) { %>
+            <p class="text-gray-600 text-lg"><%= group.description %></p>
+            <% } %>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div
+              class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center"
+            >
+              <svg
+                class="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+            </div>
+            <span class="text-gray-700 font-medium"
+              ><%= group.members.length %> members</span
+            >
+          </div>
+        </div>
+
+        <!-- Group Status & Actions -->
+        <div
+          class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200"
+        >
+          <div class="flex items-center space-x-3 mb-3 sm:mb-0">
+            <div class="flex items-center space-x-2">
+              <% if (group.status === 'ready_to_settle') { %>
+              <div
+                class="w-3 h-3 bg-orange-500 rounded-full animate-pulse"
+              ></div>
+              <span class="text-orange-600 font-semibold"
+                >🎯 Ready to Settle</span
+              >
+              <div
+                class="px-3 py-1 bg-orange-100 text-orange-700 text-xs rounded-full"
+              >
+                Time to pay up!
+              </div>
+              <% } else { %>
+              <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span class="text-green-600 font-semibold"
+                >✨ Active Session</span
+              >
+              <div
+                class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full"
+              >
+                Add expenses freely
+              </div>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- Status Toggle Button (Only for Group Creator) -->
+          <% if (req.session.user._id.toString() === group.createdBy.toString())
+          { %>
+          <form
+            action="/user/groups/<%= group._id %>/toggle-status"
+            method="POST"
+            class="inline"
+          >
+            <button
+              type="submit"
+              class="inline-flex items-center px-4 py-2 <%= group.status === 'ready_to_settle' ? 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700' : 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700' %> text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+            >
+              <% if (group.status === 'ready_to_settle') { %>
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v16m8-8H4"
+                ></path>
+              </svg>
+              Reopen Session <% } else { %>
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              Mark Ready to Settle <% } %>
+            </button>
+          </form>
+          <% } %>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <% group.members.forEach(member => { %>
+          <div
+            class="flex items-center space-x-2 bg-white/50 rounded-lg px-3 py-2 border border-gray-200"
+          >
+            <% if (member.profilePicUrl) { %>
+            <img
+              src="<%= member.signedProfilePicUrl || member.profilePicUrl %>"
+              alt="<%= member.firstName %> <%= member.lastName %>"
+              class="w-8 h-8 rounded-full border-2 border-gray-200 object-cover"
+            />
+            <% } else { %>
+            <div
+              class="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-semibold"
+            >
+              <%= (member.firstName.charAt(0) + (member.lastName ?
+              member.lastName.charAt(0) : '')).toUpperCase() %>
+            </div>
+            <% } %>
+            <span class="text-sm font-medium text-gray-700">
+              <%= member.firstName %> <%= member.lastName %>
+            </span>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+
+      <!-- Balance Overview -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Expenses -->
+        <div
+          class="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center"
+        >
+          <div
+            class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <svg
+              class="w-6 h-6 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <div class="text-2xl font-bold text-gray-800">
+            ₹<%= expenses.reduce((total, expense) => total +
+            expense.totalAmount, 0).toFixed(2) %>
+          </div>
+          <div class="text-sm text-gray-600">Total Expenses</div>
+        </div>
+
+        <!-- Number of Expenses -->
+        <div
+          class="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center"
+        >
+          <div
+            class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <svg
+              class="w-6 h-6 text-purple-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+          </div>
+          <div class="text-2xl font-bold text-gray-800">
+            <%= expenses.length %>
+          </div>
+          <div class="text-sm text-gray-600">Transactions</div>
+        </div>
+
+        <!-- You Are Owed -->
+        <div
+          class="bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl p-6 text-white text-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 cursor-pointer"
+          onclick="window.location.href='/user/groups/<%= group._id %>/you-are-owed'"
+        >
+          <div
+            class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M7 11l5-5m0 0l5 5m-5-5v12"
+              />
+            </svg>
+          </div>
+          <div class="text-2xl font-bold">
+            ₹<%= amountOwedToUser.toFixed(2) %>
+          </div>
+          <div class="text-sm opacity-90">You Are Owed</div>
+        </div>
+
+        <!-- You Owe -->
+        <div
+          class="bg-gradient-to-r from-red-500 to-rose-600 rounded-xl p-6 text-white text-center shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 cursor-pointer"
+          onclick="window.location.href='/user/groups/<%= group._id %>/you-owe'"
+        >
+          <div
+            class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 13l-5 5m0 0l-5-5m5 5V6"
+              />
+            </svg>
+          </div>
+          <div class="text-2xl font-bold">
+            ₹<%= amountUserOwes.toFixed(2) %>
+          </div>
+          <div class="text-sm opacity-90">You Owe</div>
+        </div>
+      </div>
+
+      <!-- Expenses Section -->
+      <div
+        class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20"
+      >
+        <div class="p-6 sm:p-8">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6"
+          >
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">
+              Recent Expenses
+            </h2>
+            <% if (group.status === 'ready_to_settle') { %>
+            <div
+              class="inline-flex items-center px-4 py-2 bg-gray-400 text-white font-semibold rounded-lg cursor-not-allowed opacity-60"
+            >
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"
+                ></path>
+              </svg>
+              Settlement Mode - No New Expenses
+            </div>
+            <% } else { %>
+            <button
+              onclick="window.location.href='/user/groups/<%= group._id %>/add-expense'"
+              class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+            >
+              <svg
+                class="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Add Expense
+            </button>
+            <% } %>
+          </div>
+
+          <% if (expenses.length === 0) { %>
+          <!-- Empty State -->
+          <div class="text-center py-12">
+            <div
+              class="w-20 h-20 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6"
+            >
+              <svg
+                class="w-10 h-10 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">
+              No Expenses Yet
+            </h3>
+            <p class="text-gray-600 mb-6 max-w-md mx-auto">
+              Start adding expenses to track shared costs and see who owes what
+            </p>
+            <button
+              onclick="window.location.href='/user/groups/<%= group._id %>/add-expense'"
+              class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+            >
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Add Your First Expense
+            </button>
+          </div>
+          <% } else { %>
+          <!-- Expenses List -->
+          <div class="space-y-4">
+            <% expenses.forEach(expense => { %>
+            <div
+              class="bg-white/50 rounded-xl p-6 border border-gray-200 hover:shadow-md transition-shadow duration-200"
+            >
+              <div
+                class="flex flex-col sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div class="flex-1 mb-4 sm:mb-0">
+                  <div class="flex items-center space-x-3 mb-2">
+                    <div
+                      class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center"
+                    >
+                      <svg
+                        class="w-5 h-5 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 class="text-lg font-semibold text-gray-800">
+                        <%= expense.description %>
+                      </h3>
+                      <p class="text-sm text-gray-600">
+                        Paid by <%= expense.paidBy.firstName %> <%=
+                        expense.paidBy.lastName %>
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    class="flex items-center space-x-4 text-sm text-gray-600"
+                  >
+                    <div class="flex items-center space-x-1">
+                      <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                        />
+                      </svg>
+                      <span>₹<%= expense.totalAmount.toFixed(2) %></span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                      <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                        />
+                      </svg>
+                      <span
+                        ><%= expense.splits ? expense.splits.length : 0 %>
+                        people</span
+                      >
+                    </div>
+                    <div class="flex items-center space-x-1">
+                      <% if (expense.splitType === 'equal') { %>
+                      <svg
+                        class="w-4 h-4 text-green-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span class="text-green-600">Equal split</span>
+                      <% } else { %>
+                      <svg
+                        class="w-4 h-4 text-orange-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span class="text-orange-600">Custom split</span>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span
+                    class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"
+                  >
+                    <% var userAmount = 0; if (expense.splits &&
+                    expense.splits.length > 0) { if (expense.splitType ===
+                    'equal') { userAmount = expense.totalAmount /
+                    expense.splits.length; } else { var userSplit =
+                    expense.splits.find(split => split.user._id.toString() ===
+                    user._id.toString()); userAmount = userSplit ?
+                    userSplit.amount : 0; } } %> Your share: ₹<%=
+                    userAmount.toFixed(2) %>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="mt-8 text-center">
+        <button
+          onclick="window.location.href='/user/groups/<%= group._id %>/edit'"
+          class="px-6 py-3 bg-white/70 backdrop-blur-sm border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-white hover:border-gray-300 hover:shadow-md transform hover:scale-105 transition-all duration-200"
+        >
+          <svg
+            class="w-5 h-5 inline mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+            />
+          </svg>
+          Edit Group
+        </button>
+      </div>
+    </div>
+  </main>
+</body>

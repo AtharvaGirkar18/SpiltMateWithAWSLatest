@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('partials/head') %>
+  </head>
+
+  <body
+    class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen"
+  >
+    <!-- Hero Section -->
+    <div
+      class="min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8"
+    >
+      <div class="max-w-4xl mx-auto text-center">
+        <!-- Logo and Title -->
+        <div class="mb-8">
+          <div
+            class="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full shadow-lg mb-6"
+          >
+            <svg
+              class="w-10 h-10 sm:w-12 sm:h-12 text-white"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"
+              />
+            </svg>
+          </div>
+          <h1
+            class="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4"
+          >
+            SplitMate
+          </h1>
+          <p
+            class="text-lg sm:text-xl lg:text-2xl text-gray-600 max-w-2xl mx-auto leading-relaxed"
+          >
+            The smartest way to split bills and settle expenses with friends,
+            family, and colleagues
+          </p>
+        </div>
+
+        <!-- Features Grid -->
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 max-w-5xl mx-auto"
+        >
+          <div
+            class="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+          >
+            <div
+              class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 mx-auto"
+            >
+              <svg
+                class="w-6 h-6 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">
+              Split with Groups
+            </h3>
+            <p class="text-gray-600 text-sm">
+              Create groups and easily split expenses among friends, roommates,
+              or travel buddies
+            </p>
+          </div>
+
+          <div
+            class="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+          >
+            <div
+              class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4 mx-auto"
+            >
+              <svg
+                class="w-6 h-6 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">
+              Smart Calculations
+            </h3>
+            <p class="text-gray-600 text-sm">
+              Automatic calculations for equal or unequal splits - no more
+              mental math required
+            </p>
+          </div>
+
+          <div
+            class="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 sm:col-span-2 lg:col-span-1"
+          >
+            <div
+              class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4 mx-auto"
+            >
+              <svg
+                class="w-6 h-6 text-purple-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">
+              UPI Integration
+            </h3>
+            <p class="text-gray-600 text-sm">
+              Quick settlements with integrated UPI payment links - pay and get
+              paid instantly
+            </p>
+          </div>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div
+          class="flex flex-col sm:flex-row gap-4 justify-center items-center"
+        >
+          <a
+            href="/auth/signup"
+            class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 hover:from-blue-700 hover:to-indigo-700"
+          >
+            Get Started Free
+          </a>
+          <a
+            href="/auth/login"
+            class="w-full sm:w-auto px-8 py-4 bg-white/80 backdrop-blur-sm text-gray-700 text-lg font-semibold rounded-xl border-2 border-gray-200 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 hover:bg-white hover:border-gray-300"
+          >
+            Sign In
+          </a>
+        </div>
+
+        <!-- Trust Indicators -->
+        <div
+          class="mt-16 text-center animate-fade-in-up"
+          style="animation-delay: 0.6s"
+        >
+          <p class="text-sm text-gray-500 mb-4">
+            Trusted by thousands of users worldwide
+          </p>
+          <div class="flex justify-center items-center space-x-8 text-gray-400">
+            <div
+              class="flex items-center space-x-1 hover:text-green-500 transition-colors duration-200"
+            >
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-sm font-medium">Secure</span>
+            </div>
+            <div
+              class="flex items-center space-x-1 hover:text-blue-500 transition-colors duration-200"
+            >
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"
+                />
+              </svg>
+              <span class="text-sm font-medium">Privacy First</span>
+            </div>
+            <div
+              class="flex items-center space-x-1 hover:text-purple-500 transition-colors duration-200"
+            >
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"
+                />
+              </svg>
+              <span class="text-sm font-medium">Mobile Ready</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom Animations -->
+    <style>
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes pulse-slow {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      .animate-fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+        opacity: 0;
+      }
+
+      .animate-pulse-slow {
+        animation: pulse-slow 3s ease-in-out infinite;
+      }
+
+      /* Floating animation for hero icon */
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      .animate-float {
+        animation: float 4s ease-in-out infinite;
+      }
+    </style>
+
+    <!-- Enhanced JavaScript for smooth interactions -->
+    <script>
+      // Add staggered animation to feature cards
+      document.addEventListener("DOMContentLoaded", function () {
+        const featureCards = document.querySelectorAll(".grid > div");
+        featureCards.forEach((card, index) => {
+          card.style.animationDelay = `${index * 0.1}s`;
+          card.classList.add("animate-fade-in-up");
+        });
+
+        // Add floating animation to main icon
+        const heroIcon = document.querySelector(
+          ".inline-flex.items-center.justify-center.w-20"
+        );
+        if (heroIcon) {
+          heroIcon.classList.add("animate-float");
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,315 @@
+<%- include('../partials/head') %> <%- include('../partials/nav', { isLoggedIn:
+true, showGroupButtons: true, currentGroupId: groupId }) %>
+
+<body
+  class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen"
+>
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-2xl mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <div class="mb-4">
+          <div
+            class="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-lg"
+          >
+            <svg
+              class="w-8 h-8 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M7 11l5-5m0 0l5 5m-5-5v12"
+              />
+            </svg>
+          </div>
+        </div>
+        <h1
+          class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-4"
+        >
+          You Are Owed
+        </h1>
+        <p class="text-lg text-gray-600">
+          Money that others owe you in this group
+        </p>
+      </div>
+
+      <!-- Session Status Notice -->
+      <% if (group.status === 'active') { %>
+      <div class="mb-6">
+        <div
+          class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center"
+        >
+          <div class="flex items-center justify-center mb-2">
+            <svg
+              class="w-5 h-5 mr-2 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span class="text-blue-800 font-medium">Session is Active</span>
+          </div>
+          <p class="text-sm text-blue-700">
+            Group members cannot make payments while the session is active. Mark
+            the session as "Ready to Settle" when you want to enable payments.
+          </p>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Content -->
+      <div
+        class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20"
+      >
+        <% if (members.length === 0) { %>
+        <!-- Empty State -->
+        <div class="text-center py-12 px-6">
+          <div
+            class="w-20 h-20 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
+            <svg
+              class="w-10 h-10 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+              />
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">
+            All Settled Up! 🎉
+          </h3>
+          <p class="text-gray-600 max-w-md mx-auto">
+            Great news! No one owes you money right now. You're all caught up in
+            this group.
+          </p>
+        </div>
+        <% } else { %>
+        <!-- Members List -->
+        <div class="p-6 sm:p-8">
+          <div class="space-y-4">
+            <% members.forEach(member => { const paymentRequest =
+            paymentRequests.find(pr => pr.fromUser._id.toString() ===
+            member._id.toString()); const paymentNotReceived = !paymentRequest;
+            const paymentPending = paymentRequest && paymentRequest.status ===
+            "pending"; const paymentReceived = paymentRequest &&
+            paymentRequest.status === "paid"; %>
+            <div
+              class="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-gray-200 hover:shadow-md transition-all duration-200"
+            >
+              <!-- Member Info -->
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                  <div
+                    class="w-12 h-12 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center text-white font-semibold"
+                  >
+                    <%= (member.firstName.charAt(0) + (member.lastName ?
+                    member.lastName.charAt(0) : '')).toUpperCase() %>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-800">
+                      <%= member.firstName %> <%= member.lastName %>
+                    </h3>
+                    <p class="text-2xl font-bold text-green-600">
+                      ₹<%=
+                      parseFloat(amountsOwed[member._id.toString()]).toFixed(2)
+                      %>
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Status Badge -->
+                <div class="text-right">
+                  <% if (paymentReceived) { %>
+                  <span
+                    class="inline-flex items-center px-3 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium"
+                  >
+                    <svg
+                      class="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Received
+                  </span>
+                  <% } else if (paymentPending) { %>
+                  <span
+                    class="inline-flex items-center px-3 py-2 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium"
+                  >
+                    <svg
+                      class="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Payment Pending
+                  </span>
+                  <% } else { %>
+                  <span
+                    class="inline-flex items-center px-3 py-2 bg-red-100 text-red-800 rounded-full text-sm font-medium"
+                  >
+                    <svg
+                      class="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Not Received
+                  </span>
+                  <% } %>
+                </div>
+              </div>
+
+              <!-- Action Buttons for Pending Payments -->
+              <% if (paymentPending) { %>
+              <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                <div class="flex items-center mb-3">
+                  <svg
+                    class="w-5 h-5 mr-2 text-yellow-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span class="text-yellow-800 font-medium"
+                    >Payment confirmation required</span
+                  >
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                  <form
+                    action="/user/groups/<%= groupId %>/you-are-owed/approve"
+                    method="POST"
+                    class="flex-1"
+                  >
+                    <input
+                      type="hidden"
+                      name="id"
+                      value="<%= paymentRequest._id %>"
+                    />
+                    <button
+                      type="submit"
+                      class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 px-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center"
+                    >
+                      <svg
+                        class="w-5 h-5 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      Approve Payment
+                    </button>
+                  </form>
+                  <form
+                    action="/user/groups/<%= groupId %>/you-are-owed/disapprove"
+                    method="POST"
+                    class="flex-1"
+                  >
+                    <input
+                      type="hidden"
+                      name="id"
+                      value="<%= paymentRequest._id %>"
+                    />
+                    <button
+                      type="submit"
+                      class="w-full bg-gradient-to-r from-red-600 to-rose-600 text-white py-3 px-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center"
+                    >
+                      <svg
+                        class="w-5 h-5 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                      Disapprove
+                    </button>
+                  </form>
+                </div>
+              </div>
+              <% } %>
+            </div>
+            <% }) %>
+          </div>
+        </div>
+        <% } %>
+      </div>
+
+      <!-- Back Button -->
+      <div class="mt-8 text-center">
+        <button
+          onclick="window.history.back()"
+          class="px-6 py-3 bg-white/70 backdrop-blur-sm border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-white hover:border-gray-300 hover:shadow-md transform hover:scale-105 transition-all duration-200 inline-flex items-center"
+        >
+          <svg
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          Back to Group
+        </button>
+      </div>
+    </div>
+  </main>
+</body>

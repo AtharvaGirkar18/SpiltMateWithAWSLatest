@@ -1,0 +1,358 @@
+<%- include('../partials/head') %> <%- include('../partials/nav', { isLoggedIn:
+true, showGroupButtons: true, currentGroupId: group._id }) %>
+
+<body
+  class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen"
+>
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-2xl mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1
+          class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4"
+        >
+          Edit Group
+        </h1>
+        <p class="text-lg text-gray-600">
+          Modify "<%= group.name %>" settings and members
+        </p>
+      </div>
+
+      <!-- Error Messages -->
+      <% if (errors && errors.length > 0) { %>
+      <div
+        class="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4 mb-6"
+      >
+        <div class="flex items-center mb-2">
+          <svg
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span class="font-semibold">Please fix the following errors:</span>
+        </div>
+        <ul class="list-disc list-inside space-y-1">
+          <% errors.forEach(error => { %>
+          <li><%= error %></li>
+          <% }) %>
+        </ul>
+      </div>
+      <% } %>
+
+      <!-- Edit Group Form -->
+      <div
+        class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl p-6 sm:p-8 border border-white/20"
+      >
+        <form
+          id="edit-group-form"
+          action="/user/groups/<%= group._id %>/edit"
+          method="POST"
+        >
+          <!-- Hidden input to store initial members JSON -->
+          <input
+            type="hidden"
+            id="initialMembers"
+            value="<%= JSON.stringify(group.members) %>"
+          />
+
+          <!-- Current Members Section -->
+          <div class="mb-8">
+            <h2
+              class="text-xl font-semibold text-gray-800 mb-4 flex items-center"
+            >
+              <svg
+                class="w-5 h-5 mr-2 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              Current Members
+            </h2>
+            <div id="addedUsers" class="flex flex-wrap gap-3">
+              <% group.members.forEach(member => { %>
+              <div
+                class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-xl flex items-center space-x-2 shadow-md"
+              >
+                <% if (member.profilePicUrl) { %>
+                <img
+                  src="<%= member.signedProfilePicUrl || member.profilePicUrl %>"
+                  alt="<%= member.firstName %> <%= member.lastName %>"
+                  class="w-6 h-6 rounded-full border border-white/20 object-cover"
+                />
+                <% } else { %>
+                <div
+                  class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center text-xs font-semibold"
+                >
+                  <%= (member.firstName.charAt(0) + (member.lastName ?
+                  member.lastName.charAt(0) : '')).toUpperCase() %>
+                </div>
+                <% } %>
+                <span class="font-medium"
+                  ><%= member.firstName %> <%= member.lastName %></span
+                >
+                <span class="text-blue-100 text-sm">(<%= member.email %>)</span>
+              </div>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- Add New Members Section -->
+          <div class="mb-8">
+            <label
+              class="block text-lg font-semibold text-gray-800 mb-4 flex items-center"
+              for="userSearch"
+            >
+              <svg
+                class="w-5 h-5 mr-2 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Add New Members
+            </label>
+            <p class="text-gray-600 mb-4">
+              Search by name or email to add new members to your group
+            </p>
+
+            <div class="relative">
+              <input
+                type="text"
+                id="userSearch"
+                autocomplete="off"
+                placeholder="Type to search users..."
+                class="w-full px-4 py-3 pl-12 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              />
+              <svg
+                class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+
+            <ul
+              id="searchResults"
+              class="bg-white/90 backdrop-blur-sm border border-gray-200 mt-2 rounded-xl max-h-64 overflow-y-auto shadow-lg hidden"
+            ></ul>
+          </div>
+
+          <input type="hidden" name="members" id="membersInput" />
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 pt-6">
+            <button
+              type="submit"
+              class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center"
+            >
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              Save Changes
+            </button>
+            <button
+              type="button"
+              onclick="window.location.href='/user/groups/<%= group._id %>'"
+              class="flex-1 bg-white/70 backdrop-blur-sm border-2 border-gray-200 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-white hover:border-gray-300 hover:shadow-md transition-all duration-200 flex items-center justify-center"
+            >
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const userSearch = document.getElementById("userSearch");
+    const searchResults = document.getElementById("searchResults");
+    const addedUsers = document.getElementById("addedUsers");
+    const membersInput = document.getElementById("membersInput");
+
+    // Read initial members JSON safely from hidden input
+    const initialMembersStr = document.getElementById("initialMembers").value;
+    let selectedMembers = JSON.parse(initialMembersStr || "[]");
+
+    updateAddedUsers();
+
+    userSearch.addEventListener("input", async (e) => {
+      const query = e.target.value.trim();
+      if (query.length < 2) {
+        searchResults.innerHTML = "";
+        searchResults.classList.add("hidden");
+        return;
+      }
+
+      const res = await fetch(`/user/search?q=${encodeURIComponent(query)}`);
+      const users = await res.json();
+      searchResults.innerHTML = "";
+
+      if (users.length === 0) {
+        searchResults.classList.add("hidden");
+        return;
+      }
+
+      searchResults.classList.remove("hidden");
+      users.forEach((user) => {
+        if (!selectedMembers.some((m) => m._id === user._id)) {
+          const li = document.createElement("li");
+          li.className =
+            "px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0 flex items-center space-x-3 transition-colors duration-200";
+
+          li.innerHTML = `
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold ${
+              user.profilePicUrl
+                ? "border-2 border-gray-200"
+                : "bg-gradient-to-r from-blue-400 to-purple-500"
+            }">
+              ${
+                user.profilePicUrl
+                  ? `<img src="${
+                      user.signedProfilePicUrl || user.profilePicUrl
+                    }" alt="${user.firstName} ${
+                      user.lastName
+                    }" class="w-8 h-8 rounded-full object-cover">`
+                  : `${(
+                      user.firstName.charAt(0) +
+                      (user.lastName ? user.lastName.charAt(0) : "")
+                    ).toUpperCase()}`
+              }
+            </div>
+            <div class="flex-1">
+              <div class="font-medium text-gray-800">${user.firstName} ${
+            user.lastName
+          }</div>
+              <div class="text-sm text-gray-500">${user.email}</div>
+            </div>
+            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+          `;
+
+          li.addEventListener("click", () => {
+            selectedMembers.push(user);
+            updateAddedUsers();
+            userSearch.value = "";
+            searchResults.innerHTML = "";
+            searchResults.classList.add("hidden");
+          });
+          searchResults.appendChild(li);
+        }
+      });
+    });
+
+    // Hide search results when clicking outside
+    document.addEventListener("click", (e) => {
+      if (
+        !e.target.closest("#userSearch") &&
+        !e.target.closest("#searchResults")
+      ) {
+        searchResults.classList.add("hidden");
+      }
+    });
+
+    function updateAddedUsers() {
+      // Clear existing dynamically added members (keep initial ones in HTML)
+      const dynamicMembers = addedUsers.querySelectorAll(".dynamic-member");
+      dynamicMembers.forEach((el) => el.remove());
+
+      // Add new dynamic members
+      selectedMembers.forEach((user, idx) => {
+        // Check if this user was already in the initial members
+        const isInitialMember = initialMembers.some((m) => m._id === user._id);
+        if (!isInitialMember) {
+          const div = document.createElement("div");
+          div.className =
+            "dynamic-member bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-xl flex items-center space-x-2 shadow-md";
+          div.innerHTML = `
+            <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${
+              user.profilePicUrl ? "border border-white/20" : "bg-white/20"
+            }">
+              ${
+                user.profilePicUrl
+                  ? `<img src="${
+                      user.signedProfilePicUrl || user.profilePicUrl
+                    }" alt="${user.firstName} ${
+                      user.lastName
+                    }" class="w-6 h-6 rounded-full object-cover">`
+                  : `${(
+                      user.firstName.charAt(0) +
+                      (user.lastName ? user.lastName.charAt(0) : "")
+                    ).toUpperCase()}`
+              }
+            </div>
+            <span class="font-medium">${user.firstName} ${user.lastName}</span>
+            <span class="text-green-100 text-sm">(${user.email})</span>
+            <button type="button" class="ml-2 text-white hover:text-red-200 transition-colors duration-200" onclick="removeUser(${idx})">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          `;
+          addedUsers.appendChild(div);
+        }
+      });
+
+      membersInput.value = JSON.stringify(selectedMembers.map((u) => u._id));
+    }
+
+    window.removeUser = (idx) => {
+      selectedMembers.splice(idx, 1);
+      updateAddedUsers();
+    };
+
+    // Parse initial members for comparison
+    const initialMembers = JSON.parse(initialMembersStr || "[]");
+  </script>
+</body>

@@ -1,0 +1,557 @@
+<%- include('../partials/head') %>
+<%- include('../partials/nav', { isLoggedIn: true, showGroupButtons: true, currentGroupId: group._id }) %>
+
+<body
+  class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen"
+>
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-2xl mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1
+          class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4"
+        >
+          Add Expense
+        </h1>
+        <p class="text-lg text-gray-600">
+          Add a new expense to "<%= group.name %>"
+        </p>
+      </div>
+
+      <!-- Session Status Notice -->
+      <% if (group.status === 'active') { %>
+      <div class="mb-6">
+        <div
+          class="bg-green-50 border border-green-200 rounded-xl p-4 text-center"
+        >
+          <div class="flex items-center justify-center mb-2">
+            <svg
+              class="w-5 h-5 mr-2 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span class="text-green-800 font-medium">Session is Active</span>
+          </div>
+          <p class="text-sm text-green-700">
+            You can freely add expenses while the session is active. Payments will be enabled when the session is marked as "Ready to Settle".
+          </p>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Error Messages -->
+      <% if (errors && errors.length > 0) { %>
+      <div
+        class="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4 mb-6"
+      >
+        <div class="flex items-center mb-2">
+          <svg
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span class="font-semibold">Please fix the following errors:</span>
+        </div>
+        <ul class="list-disc list-inside space-y-1">
+          <% errors.forEach(error => { %>
+          <li><%= error %></li>
+          <% }) %>
+        </ul>
+      </div>
+      <% } %>
+
+      <!-- Add Expense Form -->
+      <div
+        class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl p-6 sm:p-8 border border-white/20"
+      >
+        <form
+          id="expenseForm"
+          action="/user/groups/<%= group._id %>/add-expense"
+          method="POST"
+          class="space-y-6"
+        >
+          <!-- Activity Name -->
+          <div>
+            <label
+              class="block text-lg font-semibold text-gray-800 mb-3 flex items-center"
+            >
+              <svg
+                class="w-5 h-5 mr-2 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              Activity Name
+            </label>
+            <input
+              type="text"
+              name="description"
+              class="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              required
+              placeholder="Taxi fare, Restaurant bill, Movie tickets..."
+            />
+          </div>
+
+          <!-- Total Amount -->
+          <div>
+            <label
+              class="block text-lg font-semibold text-gray-800 mb-3 flex items-center"
+            >
+              <svg
+                class="w-5 h-5 mr-2 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                />
+              </svg>
+              Total Amount
+            </label>
+            <div class="relative">
+              <span
+                class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium"
+                >₹</span
+              >
+              <input
+                type="number"
+                min="0"
+                step="any"
+                name="totalAmount"
+                class="w-full pl-8 pr-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                required
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+
+          <!-- Paid By -->
+          <div>
+            <label
+              class="block text-lg font-semibold text-gray-800 mb-3 flex items-center"
+            >
+              <svg
+                class="w-5 h-5 mr-2 text-purple-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+              Paid By
+            </label>
+            <select
+              name="paidBy"
+              class="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              required
+            >
+              <% group.members.forEach(m => { %>
+              <option
+                value="<%= m._id %>"
+                <%= m._id.toString() === user._id.toString() ? "selected" : "" %>
+              >
+                <%= m.firstName %> <%= m.lastName %>
+              </option>
+              <% }) %>
+            </select>
+          </div>
+
+          <!-- Add Members -->
+          <div>
+            <label
+              class="block text-lg font-semibold text-gray-800 mb-3 flex items-center"
+            >
+              <svg
+                class="w-5 h-5 mr-2 text-indigo-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              Split Between
+            </label>
+            <div class="mb-4">
+              <button
+                type="button"
+                id="selectAll"
+                class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors duration-200"
+              >
+                <svg
+                  class="w-4 h-4 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                Select All
+              </button>
+            </div>
+            <div id="members" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <% group.members.forEach(m => { %>
+              <label
+                class="flex items-center p-3 bg-white/50 border border-gray-200 rounded-xl hover:bg-white hover:border-gray-300 cursor-pointer transition-all duration-200"
+              >
+                <input
+                  type="checkbox"
+                  class="member-checkbox mr-3 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                  name="splitMembers"
+                  value="<%= m._id %>"
+                  <%= m._id.toString() === user._id.toString() ? 'checked' : '' %>
+                />
+                <div class="flex items-center space-x-2">
+                  <% if (m.profilePicUrl) { %>
+                    <img
+                      src="<%= m.signedProfilePicUrl || m.profilePicUrl %>"
+                      alt="<%= m.firstName %> <%= m.lastName %>"
+                      class="w-8 h-8 rounded-full border-2 border-gray-200 object-cover"
+                    />
+                  <% } else { %>
+                    <div
+                      class="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-semibold"
+                    >
+                      <%= (m.firstName.charAt(0) + (m.lastName ? m.lastName.charAt(0) : '')).toUpperCase() %>
+                    </div>
+                  <% } %>
+                  <div>
+                    <div class="font-medium text-gray-800">
+                      <%= m.firstName %> <%= m.lastName %>
+                    </div>
+                    <div class="text-sm text-gray-500"><%= m.email %></div>
+                  </div>
+                </div>
+              </label>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- Split Type -->
+          <div>
+            <label
+              class="block text-lg font-semibold text-gray-800 mb-3 flex items-center"
+            >
+              <svg
+                class="w-5 h-5 mr-2 text-orange-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 002 2v14a2 2 0 00-2 2z"
+                />
+              </svg>
+              Split Type
+            </label>
+            <div class="flex gap-3 mb-4">
+              <button
+                type="button"
+                id="equalBtn"
+                class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+              >
+                <svg
+                  class="w-5 h-5 inline mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Equal Split
+              </button>
+              <button
+                type="button"
+                id="unequalBtn"
+                class="flex-1 px-4 py-3 bg-white/70 backdrop-blur-sm border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-white hover:border-gray-300 hover:shadow-md transition-all duration-200"
+              >
+                <svg
+                  class="w-5 h-5 inline mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Custom Split
+              </button>
+            </div>
+            <div id="splitDetail" class="space-y-3"></div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 pt-6">
+            <button
+              type="submit"
+              class="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center"
+            >
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Add Expense
+            </button>
+            <button
+              type="button"
+              onclick="window.location.href='/user/groups/<%= group._id %>'"
+              class="flex-1 bg-white/70 backdrop-blur-sm border-2 border-gray-200 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-white hover:border-gray-300 hover:shadow-md transition-all duration-200 flex items-center justify-center"
+            >
+              <svg
+                class="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Select All Members Functionality
+    document.getElementById("selectAll").onclick = () => {
+      document
+        .querySelectorAll(".member-checkbox")
+        .forEach((cb) => (cb.checked = true));
+      renderSplitFields();
+    };
+
+    // Split type toggle
+    let splitType = "equal";
+    const splitDetail = document.getElementById("splitDetail");
+    const equalBtn = document.getElementById("equalBtn");
+    const unequalBtn = document.getElementById("unequalBtn");
+
+    equalBtn.onclick = () => {
+      splitType = "equal";
+      updateSplitButtons();
+      renderSplitFields();
+    };
+
+    unequalBtn.onclick = () => {
+      splitType = "unequal";
+      updateSplitButtons();
+      renderSplitFields();
+    };
+
+    function updateSplitButtons() {
+      if (splitType === "equal") {
+        equalBtn.className =
+          "flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200";
+        unequalBtn.className =
+          "flex-1 px-4 py-3 bg-white/70 backdrop-blur-sm border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-white hover:border-gray-300 hover:shadow-md transition-all duration-200";
+      } else {
+        unequalBtn.className =
+          "flex-1 px-4 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200";
+        equalBtn.className =
+          "flex-1 px-4 py-3 bg-white/70 backdrop-blur-sm border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-white hover:border-gray-300 hover:shadow-md transition-all duration-200";
+      }
+    }
+
+    const splitMembersSelector = () =>
+      Array.from(document.querySelectorAll(".member-checkbox")).filter(
+        (cb) => cb.checked
+      );
+
+    function renderSplitFields() {
+      if (splitType === "equal") {
+        splitDetail.innerHTML =
+          "<input type='hidden' name='splitType' value='equal' />" +
+          "<div class='bg-green-50 border border-green-200 rounded-xl p-4'>" +
+          "<div class='flex items-center'>" +
+          "<svg class='w-5 h-5 mr-2 text-green-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>" +
+          "<path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'/>" +
+          "</svg>" +
+          "<span class='text-green-800 font-medium'>Amount will be split equally among selected members</span>" +
+          "</div>" +
+          "</div>";
+      } else {
+        let html =
+          "<input type='hidden' name='splitType' value='unequal' />" +
+          "<div class='bg-orange-50 border border-orange-200 rounded-xl p-4'>" +
+          "<div class='flex items-center mb-4'>" +
+          "<svg class='w-5 h-5 mr-2 text-orange-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>" +
+          "<path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z'/>" +
+          "</svg>" +
+          "<span class='text-orange-800 font-medium'>Set custom amount for each member</span>" +
+          "</div>" +
+          "<div class='space-y-3'>";
+
+        splitMembersSelector().forEach((cb) => {
+          const memberLabel = cb.closest("label");
+          const memberName = memberLabel.querySelector(".font-medium.text-gray-800").textContent;
+          console.log("Member name:", memberName); // Debug log
+          // Updated: Show full names instead of initials for clarity
+          html += `
+            <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-orange-200">
+              <div class="flex items-center space-x-2">
+                <span class="font-medium text-gray-800">${memberName}</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-gray-500">₹</span>
+                <input type="number" min="0" step="0.01" name="unequalAmounts[${cb.value}]" 
+                       class="w-24 px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" 
+                       placeholder="0.00" required/>
+              </div>
+            </div>
+          `;
+        });
+
+        html += "</div>";
+        
+        // Add total validation section
+        html += `
+          <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div class="flex items-center justify-between">
+              <span class="text-blue-800 font-medium">Total Split Amount:</span>
+              <span id="splitTotal" class="text-blue-900 font-bold">₹0.00</span>
+            </div>
+            <div class="mt-2">
+              <span class="text-blue-700 text-sm">Remaining: </span>
+              <span id="remainingAmount" class="text-blue-900 font-semibold">₹0.00</span>
+            </div>
+          </div>
+        `;
+        
+        html += "</div>";
+        splitDetail.innerHTML = html;
+        
+        // Add event listeners for real-time calculation
+        const unequalInputs = splitDetail.querySelectorAll('input[name^="unequalAmounts"]');
+        unequalInputs.forEach(input => {
+          input.addEventListener('input', calculateSplitTotal);
+        });
+        
+        // Initial calculation
+        calculateSplitTotal();
+      }
+    }
+    
+    function calculateSplitTotal() {
+      const totalAmountInput = document.querySelector('input[name="totalAmount"]');
+      const totalAmount = parseFloat(totalAmountInput.value) || 0;
+      
+      const unequalInputs = document.querySelectorAll('input[name^="unequalAmounts"]');
+      let splitTotal = 0;
+      
+      unequalInputs.forEach(input => {
+        const value = parseFloat(input.value) || 0;
+        splitTotal += value;
+      });
+      
+      const remaining = totalAmount - splitTotal;
+      
+      // Update display
+      const splitTotalElement = document.getElementById('splitTotal');
+      const remainingElement = document.getElementById('remainingAmount');
+      
+      if (splitTotalElement) {
+        splitTotalElement.textContent = `₹${splitTotal.toFixed(2)}`;
+      }
+      
+      if (remainingElement) {
+        remainingElement.textContent = `₹${remaining.toFixed(2)}`;
+        
+        // Color coding
+        if (Math.abs(remaining) < 0.01) {
+          remainingElement.className = 'text-green-600 font-semibold';
+        } else if (remaining > 0) {
+          remainingElement.className = 'text-orange-600 font-semibold';
+        } else {
+          remainingElement.className = 'text-red-600 font-semibold';
+        }
+      }
+    }
+
+    document.querySelectorAll(".member-checkbox").forEach((cb) => {
+      cb.onchange = renderSplitFields;
+    });
+
+    // Initialize
+    updateSplitButtons();
+    renderSplitFields();
+    
+    // Add event listener to total amount field for real-time calculation updates
+    const totalAmountInput = document.querySelector('input[name="totalAmount"]');
+    if (totalAmountInput) {
+      totalAmountInput.addEventListener('input', () => {
+        if (splitType === 'unequal') {
+          calculateSplitTotal();
+        }
+      });
+    }
+  </script>
+</body>

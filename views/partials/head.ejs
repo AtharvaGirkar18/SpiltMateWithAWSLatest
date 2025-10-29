@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title><%= pageTitle %></title>
+
+    <link rel="stylesheet" href="/output.css" />
+
+    <!-- u are supposed to use the above line for tailwind on ur own device,but for some reason it aint workin so chatgpt used the line below which connects with the server , could be slower and less customization -->
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Enhanced UI Styles and Interactions -->
+    <style>
+      /* Loading spinner */
+      .loading-spinner {
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top: 3px solid white;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Smooth transitions for all interactive elements */
+      button,
+      input,
+      select,
+      textarea,
+      a {
+        transition: all 0.2s ease-in-out;
+      }
+
+      /* Focus states */
+      input:focus,
+      select:focus,
+      textarea:focus {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgba(156, 163, 175, 0.1);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(59, 130, 246, 0.5);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(59, 130, 246, 0.7);
+      }
+    </style>
+
+    <!-- Global JavaScript for enhanced interactions -->
+    <script>
+      // Enhanced form submission with loading states
+      document.addEventListener("DOMContentLoaded", function () {
+        // Add loading states to all forms
+        document.querySelectorAll("form").forEach((form) => {
+          form.addEventListener("submit", function (e) {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn && !submitBtn.disabled) {
+              const originalText = submitBtn.innerHTML;
+              submitBtn.disabled = true;
+              submitBtn.innerHTML = `
+                <div class="flex items-center justify-center space-x-2">
+                  <div class="loading-spinner"></div>
+                  <span>Processing...</span>
+                </div>
+              `;
+
+              // Reset after 10 seconds as fallback
+              setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+              }, 10000);
+            }
+          });
+        });
+
+        // Add ripple effect to buttons
+        document.querySelectorAll("button, .btn").forEach((button) => {
+          button.addEventListener("click", function (e) {
+            const ripple = document.createElement("span");
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.width = ripple.style.height = size + "px";
+            ripple.style.left = x + "px";
+            ripple.style.top = y + "px";
+            ripple.classList.add("ripple");
+
+            this.appendChild(ripple);
+
+            setTimeout(() => {
+              ripple.remove();
+            }, 600);
+          });
+        });
+      });
+    </script>
+  </head>
+</html>

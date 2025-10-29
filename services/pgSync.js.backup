@@ -1,0 +1,171 @@
+const pgClient = require("./pgClient");
+const UserModel = require("../pgModels/User");
+const GroupModel = require("../pgModels/Group");
+const ExpenseModel = require("../pgModels/Expense");
+
+function _toPlain(obj) {
+  if (!obj) return obj;
+  if (typeof obj.toObject === "function") return obj.toObject();
+  return obj;
+}
+
+async function syncUser(userDoc) {
+  try {
+    const u = _toPlain(userDoc);
+    const mongoId =
+      (u._id && u._id.toString && u._id.toString()) || u.id || null;
+
+    const userData = {
+      mongo_id: mongoId,
+      first_name: u.firstName || u.first_name || null,
+      last_name: u.lastName || u.last_name || null,
+      email: u.email || null,
+      password: u.password || null,
+      profile_pic_url: u.profilePicUrl || u.profile_pic_url || null,
+      profile_pic_key: u.profilePicKey || u.profile_pic_key || null,
+      phone: u.phone || null,
+      upi_link: u.upiLink || u.upi_link || null,
+      created_at: u.createdAt ? new Date(u.createdAt) : new Date(),
+    };
+
+    await UserModel.upsert(userData);
+    return true;
+  } catch (err) {
+    console.warn(
+      "[PostgreSQL] ✗ syncUser failed:",
+      err && err.message ? err.message : err
+    );
+    return false;
+  }
+}
+
+async function syncGroup(groupDoc) {
+  try {
+    const pool = pgClient.getPool();
+    const g = _toPlain(groupDoc);
+    const mongoId =
+      (g._id && g._id.toString && g._id.toString()) ||
+      (g.id && typeof g.id === "string") ||
+      null;
+    const createdAt = g.createdAt ? new Date(g.createdAt) : new Date();
+
+    // members and expenses stored as arrays of mongo ids (strings)
+    // Normalize member/expense ids preferring `.id` string when present
+    const members = (g.members || []).map((m) => {
+      if (!m) return m;
+      if (typeof m === "string") return m;
+      if (m._id && m._id.toString) return m._id.toString();
+      if (m.id && typeof m.id === "string") return m.id;
+      if (m.toString) return m.toString();
+      return m;
+    });
+    const expenses = (g.expenses || []).map((e) => {
+      if (!e) return e;
+      if (typeof e === "string") return e;
+      if (e._id && e._id.toString) return e._id.toString();
+      if (e.id && typeof e.id === "string") return e.id;
+      if (e.toString) return e.toString();
+      return e;
+    });
+
+    const query = `INSERT INTO groups (
+      mongo_id, name, description, members, expenses, status, created_at, created_by_mongo_id
+    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+    ON CONFLICT (mongo_id) DO UPDATE SET
+      name = EXCLUDED.name,
+      description = EXCLUDED.description,
+      members = EXCLUDED.members,
+      expenses = EXCLUDED.expenses,
+      status = EXCLUDED.status,
+      created_by_mongo_id = EXCLUDED.created_by_mongo_id,
+      created_at = EXCLUDED.created_at;
+    `;
+
+    const values = [
+      mongoId,
+      g.name || null,
+      g.description || null,
+      JSON.stringify(members),
+      JSON.stringify(expenses),
+      g.status || null,
+      createdAt,
+      g.createdBy &&
+      g.createdBy._id &&
+      g.createdBy._id.toString &&
+      g.createdBy._id.toString()
+        ? g.createdBy._id.toString()
+        : (g.createdBy && g.createdBy.toString && g.createdBy.toString()) ||
+          g.createdBy ||
+          null,
+    ];
+
+    await pool.query(query, values);
+    return true;
+  } catch (err) {
+    console.warn(
+      "pg syncGroup failed:",
+      err && err.message ? err.message : err
+    );
+    return false;
+  }
+}
+
+async function syncExpense(expenseDoc) {
+  try {
+    const pool = pgClient.getPool();
+    const e = _toPlain(expenseDoc);
+    const mongoId =
+      (e._id && e._id.toString && e._id.toString()) || e.id || null;
+    const createdAt = e.createdAt ? new Date(e.createdAt) : new Date();
+
+    const splits = (e.splits || []).map((s) => ({
+      user:
+        (s.user &&
+          s.user._id &&
+          s.user._id.toString &&
+          s.user._id.toString()) ||
+        (s.user && s.user.toString && s.user.toString()) ||
+        s.user ||
+        s.userId ||
+        null,
+      amount: s.amount || null,
+    }));
+
+    const query = `INSERT INTO expenses (
+      mongo_id, group_mongo_id, description, total_amount, paid_by_mongo_id, split_type, splits, created_at
+    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+    ON CONFLICT (mongo_id) DO UPDATE SET
+      group_mongo_id = EXCLUDED.group_mongo_id,
+      description = EXCLUDED.description,
+      total_amount = EXCLUDED.total_amount,
+      paid_by_mongo_id = EXCLUDED.paid_by_mongo_id,
+      split_type = EXCLUDED.split_type,
+      splits = EXCLUDED.splits,
+      created_at = EXCLUDED.created_at;
+    `;
+
+    const values = [
+      mongoId,
+      (e.group && e.group.toString && e.group.toString()) || e.group || null,
+      e.description || null,
+      e.totalAmount != null ? Number(e.totalAmount) : null,
+      (e.paidBy && e.paidBy.toString && e.paidBy.toString()) ||
+        e.paidBy ||
+        null,
+      e.splitType || null,
+      JSON.stringify(splits),
+      createdAt,
+    ];
+
+    await pool.query(query, values);
+    return true;
+  } catch (err) {
+    console.warn(
+      "pg syncExpense failed:",
+      err && err.message ? err.message : err
+    );
+    return false;
+  }
+}
+
+module.exports = { syncUser, syncGroup, syncExpense };

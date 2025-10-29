@@ -1,0 +1,99 @@
+<%- include('head') %>
+
+<body
+  class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen"
+>
+  <div
+    class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8"
+  >
+    <div class="max-w-md w-full text-center">
+      <!-- Error Icon -->
+      <div class="mb-8">
+        <div
+          class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-red-400 to-rose-500 rounded-full shadow-lg mb-6"
+        >
+          <svg
+            class="w-12 h-12 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+            />
+          </svg>
+        </div>
+
+        <!-- 404 Text -->
+        <h1
+          class="text-6xl font-bold bg-gradient-to-r from-red-500 to-rose-600 bg-clip-text text-transparent mb-4"
+        >
+          404
+        </h1>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+          Page Not Found
+        </h2>
+        <p class="text-gray-600 mb-8 leading-relaxed">
+          Oops! The page you're looking for doesn't exist. It might have been
+          moved, deleted, or you entered the wrong URL.
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="space-y-4">
+        <button
+          onclick="window.history.back()"
+          class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-2"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          <span>Go Back</span>
+        </button>
+
+        <button
+          onclick="window.location.href='/'"
+          class="w-full bg-white/70 backdrop-blur-sm border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-white hover:border-gray-300 hover:shadow-md transform hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-2"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+            />
+          </svg>
+          <span>Go Home</span>
+        </button>
+      </div>
+
+      <!-- Additional Help -->
+      <div
+        class="mt-8 p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-gray-200"
+      >
+        <p class="text-sm text-gray-600">
+          <strong>Need help?</strong> Make sure you're logged in and have access
+          to the content you're trying to reach.
+        </p>
+      </div>
+    </div>
+  </div>
+</body>

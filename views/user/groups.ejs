@@ -1,0 +1,299 @@
+<%- include('../partials/head') %> <%- include('../partials/nav', { isLoggedIn:
+true }) %>
+
+<body
+  class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen"
+>
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header Section -->
+    <div class="text-center mb-8">
+      <h1
+        class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4"
+      >
+        Your Groups
+      </h1>
+      <p class="text-gray-600 max-w-2xl mx-auto">
+        Manage your expense groups and track shared costs with friends, family,
+        and colleagues
+      </p>
+    </div>
+
+    <% if (groups.length === 0) { %>
+    <!-- Empty State -->
+    <div class="max-w-md mx-auto text-center">
+      <div
+        class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/20"
+      >
+        <div
+          class="w-20 h-20 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6"
+        >
+          <svg
+            class="w-10 h-10 text-blue-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+            />
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">No Groups Yet</h3>
+        <p class="text-gray-600 mb-6">
+          Create your first group to start splitting expenses with friends and
+          family
+        </p>
+        <button
+          onclick="window.location.href='/user/create-group'"
+          class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 hover:from-blue-700 hover:to-indigo-700"
+        >
+          <svg
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
+          </svg>
+          Create Your First Group
+        </button>
+      </div>
+    </div>
+    <% } else { %>
+    <!-- Groups Grid -->
+    <div class="max-w-7xl mx-auto">
+      <!-- Stats Overview -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div
+          class="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center"
+        >
+          <div class="text-2xl font-bold text-blue-600">
+            <%= groups.length %>
+          </div>
+          <div class="text-sm text-gray-600">Total Groups</div>
+        </div>
+        <div
+          class="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center"
+        >
+          <div class="text-2xl font-bold text-green-600">
+            <% var uniqueMembers = []; groups.forEach(function(group) { if
+            (group.members) { group.members.forEach(function(member) { var
+            memberId = member._id.toString(); if
+            (uniqueMembers.indexOf(memberId) === -1) {
+            uniqueMembers.push(memberId); } }); } }); %> <%=
+            uniqueMembers.length %>
+          </div>
+          <div class="text-sm text-gray-600">Unique Members</div>
+        </div>
+        <div
+          class="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center"
+        >
+          <div class="text-2xl font-bold text-purple-600">
+            <%= groups.reduce((total, group) => total + (group.expenses?.length
+            || 0), 0) %>
+          </div>
+          <div class="text-sm text-gray-600">Total Expenses</div>
+        </div>
+      </div>
+
+      <!-- Groups List -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% groups.forEach(group => { %>
+        <div
+          class="bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl border border-white/20 overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300 group"
+          onclick="window.location.href='/user/groups/<%= group._id %>'"
+        >
+          <!-- Group Header -->
+          <div
+            class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 text-white"
+          >
+            <div class="flex items-center justify-between mb-2">
+              <h2 class="text-xl font-bold truncate flex-1 mr-2">
+                <%= group.name %>
+              </h2>
+              <div
+                class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Group Status -->
+            <div class="flex items-center space-x-2 mb-2">
+              <% if (group.status === 'ready_to_settle') { %>
+              <div
+                class="w-2 h-2 bg-orange-300 rounded-full animate-pulse"
+              ></div>
+              <span class="text-orange-200 text-xs font-medium"
+                >🎯 Ready to Settle</span
+              >
+              <% } else { %>
+              <div class="w-2 h-2 bg-green-300 rounded-full"></div>
+              <span class="text-green-200 text-xs font-medium"
+                >✨ Active Session</span
+              >
+              <% } %>
+            </div>
+
+            <% if (group.description) { %>
+            <p class="text-blue-100 text-sm line-clamp-2">
+              <%= group.description %>
+            </p>
+            <% } %>
+          </div>
+
+          <!-- Group Body -->
+          <div class="p-6">
+            <!-- Members Section -->
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center space-x-2">
+                <div
+                  class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center"
+                >
+                  <svg
+                    class="w-4 h-4 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                    />
+                  </svg>
+                </div>
+                <span class="text-sm font-medium text-gray-700"
+                  ><%= group.members.length %> Members</span
+                >
+              </div>
+              <div class="flex -space-x-2">
+                <% group.members.slice(0, 3).forEach(member => { %> <% if
+                (member.profilePicUrl) { %>
+                <img
+                  src="<%= member.signedProfilePicUrl || member.profilePicUrl %>"
+                  alt="<%= member.firstName %> <%= member.lastName %>"
+                  class="w-8 h-8 rounded-full border-2 border-white object-cover"
+                />
+                <% } else { %>
+                <div
+                  class="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-semibold border-2 border-white"
+                >
+                  <%= (member.firstName.charAt(0) + (member.lastName ?
+                  member.lastName.charAt(0) : '')).toUpperCase() %>
+                </div>
+                <% } %> <% }) %> <% if (group.members.length > 3) { %>
+                <div
+                  class="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs font-semibold border-2 border-white"
+                >
+                  +<%= group.members.length - 3 %>
+                </div>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Expenses Section -->
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center space-x-2">
+                <div
+                  class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center"
+                >
+                  <svg
+                    class="w-4 h-4 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <span class="text-sm font-medium text-gray-700">
+                  <%= group.expenses?.length || 0 %> Expenses
+                </span>
+              </div>
+              <% if (group.expenses && group.expenses.length > 0) { %>
+              <div class="text-right">
+                <div class="text-lg font-bold text-gray-800">
+                  ₹<%= group.expenses.reduce((total, expense) => total +
+                  (expense.totalAmount || 0), 0).toFixed(2) %>
+                </div>
+                <div class="text-xs text-gray-500">Total Spent</div>
+              </div>
+              <% } %>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex space-x-2 pt-4 border-t border-gray-100">
+              <button
+                onclick="event.stopPropagation(); window.location.href='/user/groups/<%= group._id %>/add-expense'"
+                class="flex-1 py-2 px-3 bg-blue-50 text-blue-600 text-sm font-medium rounded-lg hover:bg-blue-100 transition-colors duration-200"
+              >
+                Add Expense
+              </button>
+              <button
+                onclick="event.stopPropagation(); window.location.href='/user/groups/<%= group._id %>'"
+                class="flex-1 py-2 px-3 bg-gray-50 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors duration-200"
+              >
+                View Details
+              </button>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+
+        <!-- Add New Group Card -->
+        <div
+          class="bg-white/50 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl border-2 border-dashed border-gray-300 hover:border-blue-400 overflow-hidden cursor-pointer transform hover:scale-105 transition-all duration-300 flex items-center justify-center min-h-[300px]"
+          onclick="window.location.href='/user/create-group'"
+        >
+          <div class="text-center p-6">
+            <div
+              class="w-16 h-16 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <svg
+                class="w-8 h-8 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">
+              Create New Group
+            </h3>
+            <p class="text-sm text-gray-500">
+              Start splitting expenses with a new group
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% } %>
+  </main>
+</body>
