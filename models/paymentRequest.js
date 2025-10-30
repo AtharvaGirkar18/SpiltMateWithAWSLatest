@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 
 const paymentRequestSchema = new mongoose.Schema({
-  group: { type: mongoose.Schema.Types.ObjectId, ref: "Group", required: true },
+  group: { type: String, ref: "Group", required: true }, // Changed to String
   fromUser: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String, // Changed to String for Cognito UUIDs
     ref: "User",
     required: true,
   }, // who owes money (payer)
-  toUser: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // who is owed (payee)
+  toUser: { type: String, ref: "User", required: true }, // Changed to String for Cognito UUIDs (who is owed/payee)
   amount: { type: Number, required: true },
   status: {
     type: String,

@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
+  _id: {
+    type: String, // Allow string _id for Cognito users (UUID format)
+    required: true,
+  },
   firstName: {
     type: String,
     required: true,
@@ -34,8 +38,9 @@ const userSchema = new mongoose.Schema({
   },
   upiLink: {
     type: String,
-    required: true, // Required for easy expense settlements
+    required: false, // Optional - users can add during profile edit
     trim: true,
+    default: "", // Default to empty string
   },
   createdAt: {
     type: Date,

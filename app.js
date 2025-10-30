@@ -16,6 +16,7 @@ const pgClient = require("./services/pgClient");
 const indexRouter = require("./routes/indexRouter");
 const authRouter = require("./routes/authRouter");
 const userRouter = require("./routes/userRouter");
+const authCognito = require("./routes/authCognito");
 // Add your storeRouter, hostRouter, pageNotFound as needed
 
 const app = express();
@@ -28,6 +29,15 @@ const DB_URL = process.env.MONGODB_URI || "mongodb://localhost:27017/splitmate";
 const store = new MongoDBStore({
   uri: DB_URL,
   collection: "sessions",
+  connectionOptions: {
+    serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+    socketTimeoutMS: 45000,
+  },
+});
+
+// Catch session store errors
+store.on("error", function (error) {
+  console.error("❌ Session store error:", error.message);
 });
 
 app.set("view engine", "ejs");
@@ -96,8 +106,8 @@ app.get("/favicon.ico", (req, res) => res.status(204).end());
 
 // Routes
 app.use("/", indexRouter);
-app.use("/auth", authRouter);
-
+// app.use("/auth", authRouter); // Old MongoDB-based auth (disabled for Cognito)
+app.use("/auth", authCognito); // AWS Cognito auth
 app.use("/user", (req, res, next) => {
   if (req.isLoggedIn) {
     next();

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     profile_pic_url TEXT,
     profile_pic_key TEXT,
     phone VARCHAR(20) NOT NULL,
-    upi_link TEXT NOT NULL,
+    upi_link TEXT, -- Made optional (NOT NULL removed) - users can add later
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

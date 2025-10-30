@@ -403,7 +403,9 @@ exports.showGroupDetail = async (req, res) => {
       // Use pairwise balances Lambda to get accurate "who owes whom" relationships
       const pairwiseResp = await invokeLambda("calculatePairwiseBalances", {
         expenses: expensesPayload,
-        members: (group.members || []).map((m) => m._id.toString()),
+        members: (group.members || []).map((m) =>
+          typeof m === "string" ? m : (m._id || m).toString()
+        ),
         paymentRequests: paidPaymentRequestsForLambda,
       });
       const pairwiseData = unwrapLambdaResponse(pairwiseResp);
@@ -887,7 +889,9 @@ exports.showYouOwe = async (req, res) => {
 
     const pairwiseResp = await invokeLambda("calculatePairwiseBalances", {
       expenses: expensesPayload,
-      members: (group.members || []).map((m) => m._id.toString()),
+      members: (group.members || []).map((m) =>
+        typeof m === "string" ? m : (m._id || m).toString()
+      ),
       paymentRequests: paidPaymentRequestsForLambda,
     });
     const pairwiseData = unwrapLambdaResponse(pairwiseResp);
@@ -995,7 +999,9 @@ exports.showYouAreOwed = async (req, res) => {
 
     const pairwiseResp = await invokeLambda("calculatePairwiseBalances", {
       expenses: expensesPayload,
-      members: (group.members || []).map((m) => m._id.toString()),
+      members: (group.members || []).map((m) =>
+        typeof m === "string" ? m : (m._id || m).toString()
+      ),
       paymentRequests: paidPaymentRequestsForLambda,
     });
     const pairwiseData = unwrapLambdaResponse(pairwiseResp);
@@ -1108,7 +1114,9 @@ exports.showPayForm = async (req, res) => {
 
     const pairwiseResp = await invokeLambda("calculatePairwiseBalances", {
       expenses: expensesPayload,
-      members: (group.members || []).map((m) => m._id.toString()),
+      members: (group.members || []).map((m) =>
+        typeof m === "string" ? m : (m._id || m).toString()
+      ),
       paymentRequests: paidPaymentRequestsForLambda,
     });
     const pairwiseData = unwrapLambdaResponse(pairwiseResp);
@@ -1337,23 +1345,25 @@ const updateProfile = async (req, res) => {
   try {
     const { firstName, lastName, email, phone, upiLink } = req.body;
 
-    // Validate required fields
-    if (!firstName || !lastName || !email || !phone || !upiLink) {
+    // Validate required fields (UPI is optional)
+    if (!firstName || !lastName || !email || !phone) {
       return res.redirect(
         "/user/profile?error=" +
           encodeURIComponent(
-            "All fields are required (first name, last name, email, phone, UPI)"
+            "First name, last name, email, and phone are required"
           )
       );
     }
 
-    // Validate phone number format (Indian mobile numbers)
-    const phoneRegex = /^[6-9]\d{9}$/;
-    if (!phoneRegex.test(phone.trim())) {
+    // Validate phone number format (accepts +91XXXXXXXXXX, +91 XXXXXXXXXX, or XXXXXXXXXX)
+    // Remove all spaces and non-digit characters except +
+    const cleanedPhone = phone.trim().replace(/\s+/g, "");
+    const phoneRegex = /^(\+91)?[6-9]\d{9}$/;
+    if (!phoneRegex.test(cleanedPhone)) {
       return res.redirect(
         "/user/profile?error=" +
           encodeURIComponent(
-            "Phone number must be a valid 10-digit Indian mobile number"
+            "Phone number must be a valid Indian mobile number (10 digits or +91 followed by 10 digits)"
           )
       );
     }
@@ -1380,7 +1390,8 @@ const updateProfile = async (req, res) => {
     user.firstName = firstName.trim();
     user.lastName = lastName.trim();
     user.email = email.trim().toLowerCase();
-    user.phone = phone.trim();
+    // Remove +91 prefix if present, store only 10 digits in database
+    user.phone = cleanedPhone.replace(/^\+91/, "");
     user.upiLink = upiLink.trim();
 
     // Handle profile picture upload (req.file provided by S3 multer middleware)
